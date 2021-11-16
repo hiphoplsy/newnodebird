@@ -22,14 +22,14 @@ export const initialState = {
   unfollowError: null,
 };
 
-const dummyUser = (data) => ({
-  ...data,
-  id: 1,
-  nickname: '제로',
-  Posts: [],
-  Followings: [{ nickname: 'zero' }, { nickname: 'zero1' }, { nickname: 'zero3' }],
-  Followers: [{ nickname: 'zero' }, { nickname: 'zero1' }, { nickname: 'zero3' }],
-});
+// const dummyUser = (data) => ({
+//   ...data,
+//   id: 1,
+//   nickname: '제로',
+//   Posts: [],
+//   Followings: [{ nickname: 'zero' }, { nickname: 'zero1' }, { nickname: 'zero3' }],
+//   Followers: [{ nickname: 'zero' }, { nickname: 'zero1' }, { nickname: 'zero3' }],
+// });
 
 export const LOGIN_REQUEST = 'LOGIN_REQUEST';
 export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
@@ -68,7 +68,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOGIN_SUCCESS:
       draft.loginLoading = false;
       draft.loginDone = true;
-      draft.me = dummyUser(action.data);
+      draft.me = action.data;
       break;
     case LOGIN_FAILURE:
       draft.loginLoading = false;
