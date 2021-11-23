@@ -18,7 +18,7 @@ const CommentForm = ({ post }) => {
       data: { content: commentText, postId: post.id, userId: id },
     });
     setCommentText('');
-  }, [commentText]);
+  }, [commentText, id]);s
 
   return (
     <Form onFinish={onSubmitComment}>
