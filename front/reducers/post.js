@@ -1,6 +1,4 @@
 import produce from 'immer';
-import shortId from 'shortid';
-import faker from 'faker';
 
 export const initialState = {
   mainPosts: [],
@@ -18,28 +16,6 @@ export const initialState = {
   removePostDone: false,
   removePostError: null,
 };
-
-export const generateDummyPost = (number) => Array(number).fill().map(() => ({
-  id: shortId.generate(),
-  User: {
-    id: shortId.generate(),
-    nickname: faker.name.findName(),
-  },
-  content: faker.lorem.paragraph(),
-  Images: [{
-    src: faker.image.image(),
-  }],
-  Comments: [{
-    id: shortId.generate(),
-    User: {
-      id: shortId.generate(),
-      nickname: faker.name.name(),
-    },
-    content: faker.lorem.sentence(),
-  }],
-}));
-
-initialState.mainPosts = initialState.mainPosts.concat(generateDummyPost(10));
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
 export const ADD_POST_SUCCESS = 'ADD_POST_SUCCESS';
@@ -67,7 +43,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOAD_POSTS_SUCCESS:
       draft.loadPostsLoading = false;
       draft.loadPostsDone = true;
-      draft.mainPosts = action.data(draft.mainPosts);
+      draft.mainPosts = action.data.concat(draft.mainPosts);
       draft.hasMorePost = draft.hasMorePost.length > 50;
       break;
     case LOAD_POSTS_FAILURE:
