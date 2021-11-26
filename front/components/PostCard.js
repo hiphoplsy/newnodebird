@@ -1,26 +1,45 @@
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Card, Popover, Button, Avatar, List, Comment } from 'antd';
 import { HeartTwoTone, RetweetOutlined, HeartOutlined, MessageOutlined, EllipsisOutlined } from '@ant-design/icons';
 
+import { LIKE_POST_REQUEST, REMOVE_POST_REQUEST, UNLIKE_POST_REQUEST } from '../reducers/post';
 import CommentForm from './CommentForm';
 import PostImages from './PostImages';
 import PostCardContent from './PostCardContent';
 import FollowButton from './FollowButton';
 
 const PostCard = ({ post }) => {
+  const dispatch = useDispatch();
+  const { removePostLoading } = useSelector((state) => state.post);
   const id = useSelector((state) => state.user.me?.id);
-
-  const [liked, setLiked] = useState(false);
+  const liked = post.Likers.find((v) => v.id === id);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
 
-  const onToggleLike = useCallback(() => {
-    setLiked((prev) => !prev);
+  const onLike = useCallback(() => {
+    dispatch({
+      type: LIKE_POST_REQUEST,
+      data: post.id,
+    });
+  }, []);
+
+  const onUnLike = useCallback(() => {
+    dispatch({
+      type: UNLIKE_POST_REQUEST,
+      data: post.id,
+    });
   }, []);
 
   const onToggleComment = useCallback(() => {
     setCommentFormOpened((prev) => !prev);
+  }, []);
+
+  const onRemovePost = useCallback(() => {
+    dispatch({
+      type: REMOVE_POST_REQUEST,
+      data: post.id,
+    });
   }, []);
 
   return (
@@ -30,8 +49,8 @@ const PostCard = ({ post }) => {
         actions={[
           <RetweetOutlined key="retweet" />,
           liked
-            ? <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onToggleLike} />
-            : <HeartOutlined key="heart" onClick={onToggleLike} />,
+            ? <HeartTwoTone twoToneColor="#eb2f96" key="heart" onClick={onUnLike} />
+            : <HeartOutlined key="heart" onClick={onLike} />,
           <MessageOutlined key="comment" onClick={onToggleComment} />,
           <Popover
             key="ellipsis"
@@ -41,7 +60,7 @@ const PostCard = ({ post }) => {
                   ? (
                     <>
                       <Button>수정</Button>
-                      <Button>삭제</Button>
+                      <Button onClick={onRemovePost} loading={removePostLoading}>삭제</Button>
                     </>
                   )
                   : <Button danger>신고</Button>}
@@ -90,6 +109,7 @@ PostCard.propTypes = {
     Images: PropTypes.arrayOf(PropTypes.any),
     content: PropTypes.string.isRequired,
     Comments: PropTypes.string.isRequired,
+    Likers: PropTypes.arrayOf(PropTypes.object),
   }).isRequired,
 };
 
