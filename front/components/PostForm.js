@@ -3,11 +3,11 @@ import { Button, Form, Input } from 'antd';
 import { useDispatch, useSelector } from 'react-redux';
 
 import useInput from '../hooks/useInput';
-import { ADD_POST_REQUEST } from '../reducers/post';
+import { ADD_POST_REQUEST, UPLOAD_IMAGES_REQUEST } from '../reducers/post';
 
 const PostForm = () => {
   const dispatch = useDispatch();
-  const { addPostDone } = useSelector((state) => state.post);
+  const { addPostDone, imagePaths } = useSelector((state) => state.post);
   const imageInput = useRef();
   const [text, onChangeText, setText] = useInput('');
 
@@ -35,7 +35,7 @@ const PostForm = () => {
       imageFormData.append('image', f);
     });
     dispatch({
-      type: UPLOAD_IMAGES_REQEUST,
+      type: UPLOAD_IMAGES_REQUEST,
       data: imageFormData,
     });
   }, []);
@@ -53,6 +53,16 @@ const PostForm = () => {
         <input type="file" name="image" multiple hidden ref={imageInput} onChange={onChangeImages} />
         <Button onClick={onImageUpload}>이미지 업로드</Button>
         <Button style={{ float: 'right' }} type="primary" htmlType="submit">삐약</Button>
+      </div>
+      <div>
+        {imagePaths.map((v) => (
+          <div key={v} style={{ display: 'inline-block' }}>
+            <img src={v.src} style={{ width: '200px' }} alt={v} />
+            <div>
+              <Button>제거</Button>
+            </div>
+          </div>
+        ))}
       </div>
     </Form>
   );
