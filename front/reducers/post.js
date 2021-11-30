@@ -21,6 +21,9 @@ export const initialState = {
   unlikePostLoading: false, // 게시글 좋아요 취소 시도중
   unlikePostDone: false,
   unlikePostError: null,
+  uploadImagesLoading: false, // 이미지 업로드 시도중
+  uploadImagesDone: false,
+  uploadImagesError: null,
 };
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
@@ -46,6 +49,10 @@ export const LIKE_POST_FAILURE = 'LIKE_POST_FAILURE';
 export const UNLIKE_POST_REQUEST = 'UNLIKE_POST_REQUEST';
 export const UNLIKE_POST_SUCCESS = 'UNLIKE_POST_SUCCESS';
 export const UNLIKE_POST_FAILURE = 'UNLIKE_POST_FAILURE';
+
+export const UPLOAD_IMAGES_REQUEST = 'UPLOAD_IMAGES_REQUEST';
+export const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS';
+export const UPLOAD_IMAGES_FAILURE = 'UPLOAD_IMAGES_FAILURE';
 
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
@@ -138,6 +145,20 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case UNLIKE_POST_FAILURE:
       draft.unlikePostLoading = false;
       draft.unlikePostError = action.error;
+      break;
+    case UPLOAD_IMAGES_REQUEST:
+      draft.uploadImagesLoading = true;
+      draft.uploadImagesDone = false;
+      draft.uploadImagesError = null;
+      break;
+    case UPLOAD_IMAGES_SUCCESS:
+      draft.imagePaths = action.data; // imagePaths 백엔드에서 보낸 데이터들이 들어있음
+      draft.uploadImagesLoading = false;
+      draft.uploadImagesDone = true;
+      break;
+    case UPLOAD_IMAGES_FAILURE:
+      draft.uploadImagesLoading = false;
+      draft.uploadImagesError = action.error;
       break;
     default:
       break;

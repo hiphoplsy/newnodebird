@@ -1,4 +1,7 @@
 const express = require('express');
+const multer = require('multer');
+const path = require('path');
+
 const { Post, Image, Comment, User } = require('../models');
 const { isLoggedIn } = require('./middlewares');
 
@@ -31,6 +34,29 @@ router.post('/', isLoggedIn, async (req, res, next) => { // /POST /post
       }],
     });
     return res.status(201).json(fullPost);
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination(req, file, done) {
+      done(null, 'upload');
+    },
+    filename(req, file, done) {
+      const ext = path.extname(file.originalname); // 확장자추출 학진쓰.png => .png 추출
+      const basename = path.basename(file.originalname); // 이름추출 학진쓰.png => 학진쓰를 추출
+      done(null, basename + new Date().getTime() + ext); // 학진쓰123123.png 완성
+    },
+  }),
+  limits: { fileSize: 20 * 1024 * 1024 }, // 용량제한 20MB
+});
+
+router.post('/images', isLoggedIn, upload.array('image'), async (req, res, next) => {
+  try {
+    res.json(req.files.map((v) => v.filename));
   } catch (error) {
     console.error(error);
     next(error);
@@ -115,6 +141,8 @@ router.delete('/:postId', isLoggedIn, async (req, res, next) => { // /DELETE /po
     console.error(error);
     next(error);
   }
-})
+});
+
+
 
 module.exports = router;

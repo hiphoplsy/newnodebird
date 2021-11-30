@@ -1,19 +1,21 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { Button, Form, Input } from 'antd';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 
 import useInput from '../hooks/useInput';
 import { ADD_POST_REQUEST } from '../reducers/post';
 
 const PostForm = () => {
   const dispatch = useDispatch();
+  const { addPostDone } = useSelector((state) => state.post);
   const imageInput = useRef();
+  const [text, onChangeText, setText] = useInput('');
 
-  const onImageUpload = useCallback(() => {
-    imageInput.current.click();
-  }, [imageInput.current]);
-
-  const [text, onChangeText] = useInput('');
+  useEffect(() => {
+    if (addPostDone) {
+      setText('');
+    }
+  }, [addPostDone]);
 
   const onSubmit = useCallback(() => {
     dispatch({
@@ -21,6 +23,22 @@ const PostForm = () => {
       data: text,
     });
   }, [text]);
+
+  const onImageUpload = useCallback(() => {
+    imageInput.current.click();
+  }, [imageInput.current]);
+
+  const onChangeImages = useCallback((e) => {
+    console.log('images', e.target.files);
+    const imageFormData = new FormData();
+    [].forEach.call(e.target.files, (f) => {
+      imageFormData.append('image', f);
+    });
+    dispatch({
+      type: UPLOAD_IMAGES_REQEUST,
+      data: imageFormData,
+    });
+  }, []);
 
   return (
     <Form style={{ margin: '10px 0 20px' }} encType="multipart/form-data" onFinish={onSubmit}>
@@ -32,7 +50,7 @@ const PostForm = () => {
         placeholder="어떤 일이 일어나고 있나요?"
       />
       <div>
-        <input type="file" multiple hidden ref={imageInput} />
+        <input type="file" name="image" multiple hidden ref={imageInput} onChange={onChangeImages} />
         <Button onClick={onImageUpload}>이미지 업로드</Button>
         <Button style={{ float: 'right' }} type="primary" htmlType="submit">삐약</Button>
       </div>
