@@ -25,6 +25,9 @@ export const initialState = {
   uploadImagesLoading: false, // 이미지 업로드 시도중
   uploadImagesDone: false,
   uploadImagesError: null,
+  retweetLoading: false, // 리트윗 시도중
+  retweetDone: false,
+  retweetError: null,
 };
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
@@ -54,6 +57,10 @@ export const UNLIKE_POST_FAILURE = 'UNLIKE_POST_FAILURE';
 export const UPLOAD_IMAGES_REQUEST = 'UPLOAD_IMAGES_REQUEST';
 export const UPLOAD_IMAGES_SUCCESS = 'UPLOAD_IMAGES_SUCCESS';
 export const UPLOAD_IMAGES_FAILURE = 'UPLOAD_IMAGES_FAILURE';
+
+export const RETWEET_REQUEST = 'RETWEET_REQUEST';
+export const RETWEET_SUCCESS = 'RETWEET_SUCCESS';
+export const RETWEET_FAILURE = 'RETWEET_FAILURE';
 
 export const REMOVE_IMAGE = 'REMOVE_IMAGE';
 
@@ -166,6 +173,20 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
       break;
     case REMOVE_IMAGE:
       draft.imagePaths = draft.imagePaths.filter((v, i) => i !== action.data);
+      break;
+    case RETWEET_REQUEST:
+      draft.retweetLoading = true;
+      draft.retweetDone = false;
+      draft.retweetError = null;
+      break;
+    case RETWEET_SUCCESS:
+      draft.retweetLoading = false;
+      draft.retweetDone = true;
+      draft.mainPosts.unshift(action.data);
+      break;
+    case RETWEET_FAILURE:
+      draft.retweetLoading = false;
+      draft.retweetError = action.error;
       break;
     default:
       break;
