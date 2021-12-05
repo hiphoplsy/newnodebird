@@ -28,7 +28,7 @@ function* loadPosts(action) {
     console.log(err);
     yield put({
       type: LOAD_POSTS_FAILURE,
-      data: err.response.data,
+      error: err.response.data,
     });
   }
 }
@@ -52,7 +52,7 @@ function* addPost(action) {
     console.log(err);
     yield put({
       type: ADD_POST_FAILURE,
-      data: err.response.data,
+      error: err.response.data,
     });
   }
 }
@@ -72,7 +72,7 @@ function* addComment(action) {
     console.log(err);
     yield put({
       type: ADD_COMMENT_FAILURE,
-      data: err.response.data,
+      error: err.response.data,
     });
   }
 }
@@ -96,7 +96,7 @@ function* removePost(action) {
     console.log(err);
     yield put({
       type: REMOVE_POST_FAILURE,
-      data: err.response.data,
+      error: err.response.data,
     });
   }
 }
@@ -116,7 +116,7 @@ function* likePost(action) {
     console.log(err);
     yield put({
       type: LIKE_POST_FAILURE,
-      data: err.response.data,
+      error: err.response.data,
     });
   }
 }
@@ -136,7 +136,7 @@ function* unlikePost(action) {
     console.log(err);
     yield put({
       type: UNLIKE_POST_FAILURE,
-      data: err.response.data,
+      error: err.response.data,
     });
   }
 }
@@ -156,7 +156,7 @@ function* uploadImages(action) {
     console.log(err);
     yield put({
       type: UPLOAD_IMAGES_FAILURE,
-      data: err.response.data,
+      error: err.response.data,
     });
   }
 }
@@ -176,7 +176,7 @@ function* retweet(action) {
     console.log(err);
     yield put({
       type: RETWEET_FAILURE,
-      data: err.response.data,
+      error: err.response.data,
     });
   }
 }
