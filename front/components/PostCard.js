@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector } from 'react-redux';
 import { Card, Popover, Button, Avatar, List, Comment } from 'antd';
@@ -12,7 +12,7 @@ import FollowButton from './FollowButton';
 
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
-  const { removePostLoading, retweetError } = useSelector((state) => state.post);
+  const { removePostLoading } = useSelector((state) => state.post);
   const id = useSelector((state) => state.user.me?.id);
   const liked = post.Likers.find((v) => v.id === id);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
@@ -92,7 +92,7 @@ const PostCard = ({ post }) => {
         title={post.RetweetId ? `${post.User.nickname}님이 리트윗하셨습니다.` : null}
         extra={<FollowButton post={post} />}
       >
-        {post.RetweetId && post.RetweetId
+        {post.RetweetId && post.Retweet
           ? (
             <Card
               cover={post.Retweet.Images[0] && <PostImages images={post.Retweet.Images} />}
