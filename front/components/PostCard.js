@@ -13,7 +13,7 @@ import FollowButton from './FollowButton';
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
   const { removePostLoading } = useSelector((state) => state.post);
-  const id = useSelector((state) => state.user.me?.id);
+  const id = useSelector((state) => state.user.me?.id); // state.user.me && state.user.me.id
   const liked = post.Likers.find((v) => v.id === id);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
 
