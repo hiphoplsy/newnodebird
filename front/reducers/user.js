@@ -1,7 +1,8 @@
 import produce from 'immer';
 
 export const initialState = {
-  me: null,
+  me: null, // 내정보
+  userInfo: null, // 유저정보
   loginLoading: false, // 로그인 시도중
   loginDone: false,
   loginError: null,
@@ -20,7 +21,10 @@ export const initialState = {
   unfollowLoading: false, // 언팔로우 시도중
   unfollowDone: false,
   unfollowError: null,
-  loadUserLoading: false, // 유저정보 불리오기 시도중
+  loadMyInfoLoading: false, // 내정보 불러오기 시도중
+  loadMyInfoDone: false,
+  loadMyInfoError: null,
+  loadUserLoading: false, // 유저정보 불러오기 시도중
   loadUserDone: false,
   loadUserError: null,
   loadFollowingsLoading: false, // 팔로잉목록 불러오기 시도중
@@ -42,6 +46,10 @@ export const initialState = {
 //   Followings: [{ nickname: 'zero' }, { nickname: 'zero1' }, { nickname: 'zero3' }],
 //   Followers: [{ nickname: 'zero' }, { nickname: 'zero1' }, { nickname: 'zero3' }],
 // });
+
+export const LOAD_MY_INFO_REQUEST = 'LOAD_MY_INFO_REQUEST';
+export const LOAD_MY_INFO_SUCCESS = 'LOAD_MY_INFO_SUCCESS';
+export const LOAD_MY_INFO_FAILURE = 'LOAD_MY_INFO_FAILURE';
 
 export const LOAD_USER_REQUEST = 'LOAD_USER_REQUEST';
 export const LOAD_USER_SUCCESS = 'LOAD_USER_SUCCESS';
@@ -88,6 +96,20 @@ export const REMOVE_POST_OF_ME = 'REMOVE_POST_OF_ME';
 
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
+    case LOAD_MY_INFO_REQUEST:
+      draft.loadMyInfoLoading = true;
+      draft.loadMyInfoDone = false;
+      draft.loadMyInfoError = null;
+      break;
+    case LOAD_MY_INFO_SUCCESS:
+      draft.loadMyInfoLoading = false;
+      draft.loadMyInfoDone = true;
+      draft.me = action.data;
+      break;
+    case LOAD_MY_INFO_FAILURE:
+      draft.loadMyInfoLoading = false;
+      draft.loadMyInfoError = action.error;
+      break;
     case LOAD_USER_REQUEST:
       draft.loadUserLoading = true;
       draft.loadUserDone = false;
@@ -96,7 +118,7 @@ const reducer = (state = initialState, action) => produce(state, (draft) => {
     case LOAD_USER_SUCCESS:
       draft.loadUserLoading = false;
       draft.loadUserDone = true;
-      draft.me = action.data;
+      draft.userInfo = action.data;
       break;
     case LOAD_USER_FAILURE:
       draft.loadUserLoading = false;
