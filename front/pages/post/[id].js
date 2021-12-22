@@ -33,6 +33,15 @@ const Post = () => {
   );
 };
 
+// export async function getStaticPaths() {
+//   return {
+//     paths: [
+//       { params: { id: '1' } },
+//     ],
+//     fallback: false,
+//   };
+// }
+
 export const getServerSideProps = wrapper.getServerSideProps(async (context) => {
   console.log('getServerSideProps start');
   const cookie = context.req ? context.req.headers.cookie : '';
