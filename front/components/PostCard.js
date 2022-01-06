@@ -6,7 +6,7 @@ import { Card, Popover, Button, Avatar, List, Comment } from 'antd';
 import { HeartTwoTone, RetweetOutlined, HeartOutlined, MessageOutlined, EllipsisOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
-import { LIKE_POST_REQUEST, REMOVE_POST_REQUEST, UNLIKE_POST_REQUEST, RETWEET_REQUEST } from '../reducers/post';
+import { LIKE_POST_REQUEST, REMOVE_POST_REQUEST, UNLIKE_POST_REQUEST, RETWEET_REQUEST, UPDATE_POST_REQUEST } from '../reducers/post';
 import CommentForm from './CommentForm';
 import PostImages from './PostImages';
 import PostCardContent from './PostCardContent';
@@ -20,6 +20,7 @@ const PostCard = ({ post }) => {
   const id = useSelector((state) => state.user.me?.id); // state.user.me && state.user.me.id
   const liked = post.Likers.find((v) => v.id === id);
   const [commentFormOpened, setCommentFormOpened] = useState(false);
+  const [editMode, setEditmode] = useState(false);
 
   const onLike = useCallback(() => {
     if (!id) {
@@ -65,6 +66,27 @@ const PostCard = ({ post }) => {
     });
   }, [id]);
 
+  const onClickUpdate = useCallback(() => {
+    if (!id) {
+      return alert('로그인이 필요합니다.');
+    }
+    setEditmode(true);
+  }, []);
+
+  const onChangePost = useCallback((editText) => () => {
+    dispatch({
+      type: UPDATE_POST_REQUEST,
+      data: {
+        PostId: post.id,
+        content: editText,
+      },
+    });
+  }, [post]);
+
+  const onCancelUpdatePost = useCallback(() => {
+    setEditmode(false);
+  }, []);
+
   return (
     <div style={{ marginBottom: '10px' }}>
       <Card
@@ -82,7 +104,7 @@ const PostCard = ({ post }) => {
                 { id && post.User.id === id
                   ? (
                     <>
-                      <Button>수정</Button>
+                      {!post.RetweetId && <Button onClick={onClickUpdate}>수정</Button>}
                       <Button onClick={onRemovePost} loading={removePostLoading}>삭제</Button>
                     </>
                   )
@@ -109,7 +131,7 @@ const PostCard = ({ post }) => {
                   </Link>
                 )}
                 title={post.Retweet.User.nickname[0]}
-                description={<PostCardContent postData={post.Retweet.content} />}
+                description={<PostCardContent postData={post.Retweet.content} onChangePost={onChangePost} onCancelUpdatePost={onCancelUpdatePost} />}
               />
             </Card>
           )
@@ -123,7 +145,7 @@ const PostCard = ({ post }) => {
                   </Link>
                 )}
                 title={post.User.nickname[0]}
-                description={<PostCardContent postData={post.content} />}
+                description={<PostCardContent editMode={editMode} postData={post.content} onChangePost={onChangePost} onCancelUpdatePost={onCancelUpdatePost} />}
               />
             </>
           )}
