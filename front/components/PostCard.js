@@ -1,25 +1,32 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import Link from 'next/link';
 import { useDispatch, useSelector } from 'react-redux';
-import { Card, Popover, Button, Avatar, List, Comment } from 'antd';
+import { Card, Popover, Button, Avatar, List, Comment, Modal, Input, message } from 'antd';
 import { HeartTwoTone, RetweetOutlined, HeartOutlined, MessageOutlined, EllipsisOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
-import { LIKE_POST_REQUEST, REMOVE_POST_REQUEST, UNLIKE_POST_REQUEST, RETWEET_REQUEST, UPDATE_POST_REQUEST } from '../reducers/post';
+import { LIKE_POST_REQUEST, REMOVE_POST_REQUEST, UNLIKE_POST_REQUEST, RETWEET_REQUEST, UPDATE_POST_REQUEST, REPORT_POST_REQUEST } from '../reducers/post';
 import CommentForm from './CommentForm';
 import PostImages from './PostImages';
 import PostCardContent from './PostCardContent';
 import FollowButton from './FollowButton';
+import useInput from '../hooks/useInput';
 
 moment.locale('ko');
 
 const PostCard = ({ post }) => {
   const dispatch = useDispatch();
-  const { removePostLoading } = useSelector((state) => state.post);
+  const removePostLoading = useSelector((state) => state.post.removePostLoading);
+  const reportPostLoading = useSelector((state) => state.post.reportPostLoading);
+  const reportPostDone = useSelector((state) => state.post.reportPostDone);
+  const reportPostError = useSelector((state) => state.post.reportPostError);
   const id = useSelector((state) => state.user.me?.id); // state.user.me && state.user.me.id
   const liked = post.Likers.find((v) => v.id === id);
+
   const [commentFormOpened, setCommentFormOpened] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [reportText, onChangeReportText] = useInput('');
   const [editMode, setEditmode] = useState(false);
 
   const onLike = useCallback(() => {
@@ -87,6 +94,35 @@ const PostCard = ({ post }) => {
     setEditmode(false);
   }, []);
 
+  const onClickReport = useCallback(() => {
+    console.log('신고', post.id);
+    setModalVisible(true);
+  }, []);
+
+  const onCloseModal = useCallback(() => {
+    setModalVisible(false);
+  }, []);
+
+  const onSubmitReport = useCallback(() => {
+    console.log('submit', id, post.id, reportText);
+    dispatch({
+      type: REPORT_POST_REQUEST,
+      data: {
+        postId: post.id,
+        content: reportText,
+      },
+    });
+  }, [reportText]);
+
+  useEffect(() => {
+    if (reportPostDone) {
+      setModalVisible(false);
+    }
+    if (reportPostError) {
+      setModalVisible(false);
+    }
+  }, [reportPostDone, reportPostError]);
+
   return (
     <div style={{ marginBottom: '10px' }}>
       <Card
@@ -108,7 +144,7 @@ const PostCard = ({ post }) => {
                       <Button onClick={onRemovePost} loading={removePostLoading}>삭제</Button>
                     </>
                   )
-                  : <Button danger>신고</Button>}
+                  : <Button danger onClick={onClickReport}>신고</Button>}
               </Button.Group>
             )}
           >
@@ -118,6 +154,17 @@ const PostCard = ({ post }) => {
         title={post.RetweetId ? `${post.User.nickname}님이 리트윗하셨습니다.` : null}
         extra={<FollowButton post={post} />}
       >
+        <Modal
+          title="신고하기"
+          visible={modalVisible}
+          onOk={onSubmitReport}
+          confirmLoading={reportPostLoading}
+          onCancel={onCloseModal}
+        >
+          <form>
+            <Input.TextArea value={reportText} onChange={onChangeReportText} />
+          </form>
+        </Modal>
         {post.RetweetId && post.Retweet
           ? (
             <Card

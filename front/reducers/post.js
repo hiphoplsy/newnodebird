@@ -35,6 +35,9 @@ export const initialState = {
   retweetLoading: false, // 리트윗 시도중
   retweetDone: false,
   retweetError: null,
+  reportPostLoading: false, // 신고하기 시도중
+  reportPostDone: false,
+  reportPostError: null,
 };
 
 export const ADD_POST_REQUEST = 'ADD_POST_REQUEST';
@@ -85,10 +88,28 @@ export const UPDATE_POST_REQUEST = 'UPDATE_POST_REQUEST';
 export const UPDATE_POST_SUCCESS = 'UPDATE_POST_SUCCESS';
 export const UPDATE_POST_FAILURE = 'UPDATE_POST_FAILURE';
 
+export const REPORT_POST_REQUEST = 'REPORT_POST_REQUEST';
+export const REPORT_POST_SUCCESS = 'REPORT_POST_SUCCESS';
+export const REPORT_POST_FAILURE = 'REPORT_POST_FAILURE';
+
 export const REMOVE_IMAGE = 'REMOVE_IMAGE';
 
 const reducer = (state = initialState, action) => produce(state, (draft) => {
   switch (action.type) {
+    case REPORT_POST_REQUEST:
+      draft.reportPostLoading = true;
+      draft.reportPostDone = false;
+      draft.reportPostError = false;
+      break;
+    case REPORT_POST_SUCCESS:
+      draft.reportPostLoading = false;
+      draft.reportPostDone = true;
+      draft.mainPosts.find((v) => v.id === action.data.PostId).content = action.data.content;
+      break;
+    case REPORT_POST_FAILURE:
+      draft.reportPostLoading = false;
+      draft.reportPostError = action.error;
+      break;
     case UPDATE_POST_REQUEST:
       draft.updatePostLoading = true;
       draft.updatePostDone = false;

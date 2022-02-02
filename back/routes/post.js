@@ -2,10 +2,12 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
+const nodemailer = require('nodemailer');
 
-const { Post, Image, Comment, User, Hashtag } = require('../models');
+const { Post, Image, Comment, User, Hashtag, Report } = require('../models');
 const { isLoggedIn } = require('./middlewares');
 
+const prod = porcess.env.NODE_ENV === 'production';
 const router = express.Router();
 
 try {
@@ -81,6 +83,58 @@ router.post('/', isLoggedIn, upload.none(), async (req, res, next) => { // /POST
 router.post('/images', isLoggedIn, upload.array('image'), async (req, res, next) => {
   try {
     res.json(req.files.map((v) => v.filename));
+  } catch (error) {
+    console.error(error);
+    next(error);
+  }
+});
+
+router.post('/:postId/report', isLoggedIn, async (req, res, next) => {
+  try {
+    const post = await post.findOne({
+      where: { id: req.params.postId },
+    });
+    if (!post) {
+      return res.status(403).send('존재하지 않는 게시글입니다.');
+    }
+    const exReport = await Post.findOne({
+      where: {
+        postId: parseInt(req.params.postId, 10),
+        userId: req.user.id,
+      },
+    });
+    if (exReport) {
+      return res.status(403).send('이미 신고한 게시글입니다.');
+    }
+    await Report.create({
+      content: req.body.content,
+      postId: parseInt(req.params.postId, 10),
+      userId: req.user.id,
+    });
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com',
+      port: 465,
+      service: 'gmail',
+      secure: true,
+      auth: {
+        user: 'hiphoplsy@gmail.com',
+        pass: process.env.GMAIL_PASSWORD,
+      },
+    });
+      await transporter.verify();
+      await transporter.sendMail({
+        from: '"NodeBird 신고내역" <report@nodebird.com>',
+        to: '"NodeBird 관리자" <hiphoplsy@gmail.com>',
+        subject: 'NodeBird - 신고 발생',
+        html: `
+          <div>
+            <a href="${prod ? 'https://nodebird.com' : 'http://localhost:3060'}/post/${req.params.postId}"></a>
+            <p>${req.body.content}</p>
+          </div>
+          `,
+      });
+      console.log('Mail sent');
+      res.status(201).send('ok');
   } catch (error) {
     console.error(error);
     next(error);

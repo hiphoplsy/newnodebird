@@ -9,6 +9,8 @@ module.exports = class Posts extends Model {
         allowNull: false,
       },
     }, {
+      modelName: 'Post',
+      tableName: 'posts',
       charset: 'utf8mb4',
       collate: 'utf8mb4_general_ci', //한글 저장, mb4 -> 이모티콘저장
       sequelize,
@@ -21,6 +23,7 @@ module.exports = class Posts extends Model {
     db.Post.hasMany(db.Image);
     db.Post.belongsToMany(db.User, { through: 'Like', as: 'Likers' });
     db.Post.belongsTo(db.Post, { as: 'Retweet' });
+    db.Post.hasMany(db.Report);
   }
 };
 

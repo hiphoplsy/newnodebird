@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { END } from 'redux-saga';
 import axios from 'axios';
+import { message } from 'antd';
 
 import { LOAD_POSTS_REQUEST } from '../reducers/post';
 import { LOAD_MY_INFO_REQUEST } from '../reducers/user';
@@ -13,14 +14,29 @@ import wrapper from '../store/configureStore';
 
 const Home = () => {
   const dispatch = useDispatch();
-  const { me } = useSelector((state) => state.user);
-  const { mainPosts, hasMorePost, loadPostLoading, retweetError } = useSelector((state) => state.post);
+  const me = useSelector((state) => state.user.me);
+  const mainPosts = useSelector((state) => state.post.mainPosts);
+  const hasMorePost = useSelector((state) => state.post.hasMorePost);
+  const loadPostLoading = useSelector((state) => state.post.loadPostLoading);
+  const retweetError = useSelector((state) => state.post.retweetError);
+
+  const reportPostDone = useSelector((state) => state.post.reportPostDone);
+  const reportPostError = useSelector((state) => state.post.reportPostError);
 
   useEffect(() => {
     if (retweetError) {
       alert(retweetError);
     }
   }, [retweetError]);
+
+  useEffect(() => {
+    if (reportPostDone) {
+      message.success('신고가 완료되었습니다.', 5);
+    }
+    if (reportPostError) {
+      message.error(reportPostError, 5);
+    }
+  }, [reportPostDone, reportPostError]);
 
   useEffect(() => {
     function onScroll() {
